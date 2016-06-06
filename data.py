@@ -2,6 +2,7 @@
 
 import numpy as np
 
+default_vocab = '\x00abcdefghijklmnopqrstuvwxyz'
 
 def arg_close_not_under(x, reference_values):
     ''' Return the index in reference_values that is closest
@@ -28,6 +29,21 @@ def data_pair(prompts=('hello', 'goodbye', 'talk to me'),
         response = np.random.choice(np.concatenate((responses[:prompt_idx], responses[(prompt_idx + 1):])))
 
     return prompt, response
+
+def string_to_onehot(input, vocab, add_end_token=True):
+    vocab = list(vocab)
+    if add_end_token:
+        input = input + '\x00'
+    indices, vocables = zip(*enumerate(vocab))
+    reverse_vocab = dict(zip(vocables, indices))
+
+    input_indices = [reverse_vocab[word] for word in input
+                     if word in reverse_vocab]
+
+    input_onehot = np.zeros((len(vocab), len(input)),dtype=np.uint8)
+    for position, index in enumerate(input_indices):
+        input_onehot[index, position] = 1
+    return input_onehot
 
 
 if __name__ == "__main__":
